@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -102,7 +103,7 @@ export default function Home() {
 
               <div className="flex space-x-2">
                 <Button asChild className="flex-1">
-                  <a href="/user">My Account</a>
+                  <Link href="/user">My Account</Link>
                 </Button>
                 <Button
                   variant="destructive"
@@ -173,10 +174,10 @@ export default function Home() {
               {/* Email Login Buttons */}
               <div className="flex space-x-2">
                 <Button asChild className="flex-1">
-                  <a href="/login">Sign In</a>
+                  <Link href="/login">Sign In</Link>
                 </Button>
                 <Button asChild variant="secondary" className="flex-1">
-                  <a href="/register">Sign Up</a>
+                  <Link href="/register">Sign Up</Link>
                 </Button>
               </div>
             </>

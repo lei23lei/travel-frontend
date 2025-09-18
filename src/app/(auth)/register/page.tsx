@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -258,12 +259,12 @@ export default function Register() {
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
                 Already have an account?{" "}
-                <a
+                <Link
                   href="/login"
                   className="text-primary hover:underline font-medium"
                 >
                   Sign in
-                </a>
+                </Link>
               </p>
             </div>
           </form>

@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff, Github, Loader2 } from "lucide-react";
+import Link from "next/link";
 
 // Validation schema for login
 const loginSchema = z.object({
@@ -193,6 +194,15 @@ export default function Login() {
                 </p>
               </div>
             )}
+            {/* forgot password link */}
+            <div className="text-right">
+              <Link
+                href="/forgot-password"
+                className="text-primary hover:underline font-medium text-sm mr-2"
+              >
+                Forgot Password?
+              </Link>
+            </div>
 
             {/* Submit Button */}
             <Button type="submit" disabled={loading} className="w-full">
@@ -209,8 +219,16 @@ export default function Login() {
               )}
             </Button>
 
-            {/* Register Link */}
-            <div className="text-center">
+            {/* Links */}
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                <a
+                  href="/forgot-password"
+                  className="text-primary hover:underline font-medium"
+                >
+                  Forgot your password?
+                </a>
+              </p>
               <p className="text-sm text-muted-foreground">
                 Don't have an account?{" "}
                 <a

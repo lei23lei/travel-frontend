@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -117,10 +118,10 @@ export default function OAuthSuccess() {
               </CardTitle>
               <CardDescription className="mb-6">{message}</CardDescription>
               <Button asChild>
-                <a href="/user">
+                <Link href="/user">
                   <Home className="w-4 h-4 mr-2" aria-hidden="true" />
                   Go to Dashboard
-                </a>
+                </Link>
               </Button>
             </>
           )}
@@ -137,16 +138,16 @@ export default function OAuthSuccess() {
               <CardDescription className="mb-6">{message}</CardDescription>
               <div className="flex space-x-2 w-full">
                 <Button asChild className="flex-1">
-                  <a href="/login">
+                  <Link href="/login">
                     <RotateCcw className="w-4 h-4 mr-2" aria-hidden="true" />
                     Try Again
-                  </a>
+                  </Link>
                 </Button>
                 <Button asChild variant="outline" className="flex-1">
-                  <a href="/">
+                  <Link href="/">
                     <Home className="w-4 h-4 mr-2" aria-hidden="true" />
                     Go Home
-                  </a>
+                  </Link>
                 </Button>
               </div>
             </>
