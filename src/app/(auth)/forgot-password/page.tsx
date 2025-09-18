@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Mail, Loader2, CheckCircle } from "lucide-react";
+import { authAPI } from "@/services/auth";
 
 // Validation schema for forgot password
 const forgotPasswordSchema = z.object({
@@ -45,25 +46,12 @@ export default function ForgotPassword() {
       setError(null);
       setIsLoading(true);
 
-      // TODO: Replace with actual API call to your backend
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/auth/forgot-password`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await authAPI.forgotPassword(data);
 
-      if (response.ok) {
+      if (response.status === "success") {
         setIsSubmitted(true);
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to send reset email");
+        throw new Error(response.message || "Failed to send reset email");
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : "Something went wrong");

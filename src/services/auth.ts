@@ -37,6 +37,15 @@ export interface UserLogin {
   password: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  new_password: string;
+}
+
 // Re-export token manager from api-client for convenience
 export const tokenManager = apiTokenManager;
 
@@ -119,6 +128,36 @@ export const authAPI = {
     } catch (error: any) {
       console.error("Failed to get current user:", error);
       return null;
+    }
+  },
+
+  forgotPassword: async (
+    request: ForgotPasswordRequest
+  ): Promise<APIResponse> => {
+    try {
+      const response = await apiClient.post<APIResponse>(
+        "/auth/forgot-password",
+        request
+      );
+
+      return response.data;
+    } catch (error: any) {
+      return apiUtils.handleError(error);
+    }
+  },
+
+  resetPassword: async (
+    request: ResetPasswordRequest
+  ): Promise<APIResponse> => {
+    try {
+      const response = await apiClient.post<APIResponse>(
+        "/auth/reset-password",
+        request
+      );
+
+      return response.data;
+    } catch (error: any) {
+      return apiUtils.handleError(error);
     }
   },
 };

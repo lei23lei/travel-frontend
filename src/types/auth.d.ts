@@ -31,6 +31,15 @@ interface UserLogin {
   password: string;
 }
 
+interface ForgotPasswordRequest {
+  email: string;
+}
+
+interface ResetPasswordRequest {
+  token: string;
+  new_password: string;
+}
+
 interface AuthContextType {
   user: UserResponse | null;
   loading: boolean;
