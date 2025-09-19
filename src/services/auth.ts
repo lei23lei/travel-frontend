@@ -50,6 +50,10 @@ export interface UserUpdate {
   name: string;
 }
 
+export interface AvatarUpdate {
+  avatar_url: string;
+}
+
 // Re-export token manager from api-client for convenience
 export const tokenManager = apiTokenManager;
 
@@ -172,6 +176,21 @@ export const authAPI = {
       const response = await apiClient.patch<APIResponse<UserResponse>>(
         "/auth/me",
         userUpdate
+      );
+
+      return response.data;
+    } catch (error: any) {
+      return apiUtils.handleError(error);
+    }
+  },
+
+  updateUserAvatar: async (
+    avatarUpdate: AvatarUpdate
+  ): Promise<APIResponse<UserResponse>> => {
+    try {
+      const response = await apiClient.patch<APIResponse<UserResponse>>(
+        "/auth/me/avatar",
+        avatarUpdate
       );
 
       return response.data;

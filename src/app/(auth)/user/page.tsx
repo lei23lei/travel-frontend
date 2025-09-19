@@ -7,6 +7,7 @@ import { authAPI, authUtils } from "@/services/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
 import { nameSchema } from "@/lib/validations";
+import { uploadToCloudinary, generateRandomAvatar } from "@/lib/cloudinary";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,6 +31,9 @@ import {
   Pencil,
   Check,
   X,
+  Upload,
+  Camera,
+  Shuffle,
 } from "lucide-react";
 
 export default function User() {
@@ -38,6 +42,9 @@ export default function User() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editingName, setEditingName] = useState("");
   const [nameError, setNameError] = useState("");
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isRefreshingAvatar, setIsRefreshingAvatar] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(false);
   const { logout: contextLogout, refreshUser } = useAuth();
 
   // Handle client-side mounting
@@ -90,6 +97,45 @@ export default function User() {
     },
   });
 
+  // Preload image function
+  const preloadImage = (src: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = reject;
+      img.src = src;
+    });
+  };
+
+  // Update avatar mutation
+  const updateAvatarMutation = useMutation({
+    mutationFn: async (avatarUrl: string) => {
+      setIsImageLoading(true);
+      try {
+        // Preload the new image
+        await preloadImage(avatarUrl);
+        // Update the avatar in backend
+        return await authAPI.updateUserAvatar({ avatar_url: avatarUrl });
+      } finally {
+        setIsImageLoading(false);
+      }
+    },
+    onSuccess: async () => {
+      setIsRefreshingAvatar(true);
+      try {
+        await refetch(); // Refresh user data
+        await refreshUser(); // Update AuthContext
+      } finally {
+        setIsRefreshingAvatar(false);
+      }
+    },
+    onError: (error) => {
+      console.error("Failed to update avatar:", error);
+      setIsRefreshingAvatar(false);
+      setIsImageLoading(false);
+    },
+  });
+
   const handleLogout = () => {
     logoutMutation.mutate();
   };
@@ -135,6 +181,31 @@ export default function User() {
     } else if (e.key === "Escape") {
       handleCancelEdit();
     }
+  };
+
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploadingAvatar(true);
+      const uploadResult = await uploadToCloudinary(file);
+      updateAvatarMutation.mutate(uploadResult.secure_url);
+    } catch (error) {
+      console.error("Failed to upload avatar:", error);
+      // You could add a toast notification here
+    } finally {
+      setIsUploadingAvatar(false);
+      // Reset the input
+      event.target.value = "";
+    }
+  };
+
+  const handleGenerateRandomAvatar = () => {
+    const randomAvatar = generateRandomAvatar(user?.email);
+    updateAvatarMutation.mutate(randomAvatar);
   };
 
   // Don't render anything until client-side hydration
@@ -268,20 +339,59 @@ export default function User() {
             {/* Avatar Section */}
             <div className="flex items-center space-x-6 pb-6">
               <div className="flex flex-col items-center justify-center gap-2">
-                <Avatar className="h-20 w-20 bg-gradient-to-r from-pink-300 to-purple-300">
-                  <AvatarImage
-                    src={user.avatar_url || undefined}
-                    alt={user.name || user.email}
-                  />
-                  <AvatarFallback className="text-2xl font-bold">
-                    {user.name
-                      ? user.name.charAt(0).toUpperCase()
-                      : user.email.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <p className="text-xs text-muted-foreground underline cursor-pointer">
-                  Edit
-                </p>
+                <div className="relative">
+                  <Avatar className="h-20 w-20 bg-gradient-to-r from-pink-300 to-purple-300">
+                    <AvatarImage
+                      src={user.avatar_url || undefined}
+                      alt={user.name || user.email}
+                      className="object-cover"
+                    />
+                    <AvatarFallback className="text-2xl font-bold">
+                      {user.name
+                        ? user.name.charAt(0).toUpperCase()
+                        : user.email.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  {(isUploadingAvatar ||
+                    updateAvatarMutation.isPending ||
+                    isRefreshingAvatar ||
+                    isImageLoading) && (
+                    <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
+                      <Loader2 className="h-6 w-6 animate-spin text-white" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-1">
+                  <label className="text-xs text-muted-foreground underline cursor-pointer hover:text-primary">
+                    <Upload className="w-3 h-3 inline mr-1" />
+                    Upload
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      disabled={
+                        isUploadingAvatar ||
+                        updateAvatarMutation.isPending ||
+                        isRefreshingAvatar ||
+                        isImageLoading
+                      }
+                    />
+                  </label>
+                  <button
+                    onClick={handleGenerateRandomAvatar}
+                    disabled={
+                      isUploadingAvatar ||
+                      updateAvatarMutation.isPending ||
+                      isRefreshingAvatar ||
+                      isImageLoading
+                    }
+                    className="text-xs text-muted-foreground underline cursor-pointer hover:text-primary disabled:opacity-50"
+                  >
+                    <Shuffle className="w-3 h-3 inline mr-1" />
+                    Random
+                  </button>
+                </div>
               </div>
               <div className="space-y-2">
                 <div className="flex flex-row items-center gap-2">

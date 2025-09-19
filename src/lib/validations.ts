@@ -15,6 +15,27 @@ const nameSchema = z
   .max(30, "Name must be 30 characters or less")
   .transform((val) => val.trim());
 
+const avatarUrlSchema = z
+  .string()
+  .min(1, "Avatar URL is required and cannot be empty")
+  .url("Avatar URL must be a valid URL")
+  .refine(
+    (url) => url.startsWith("http://") || url.startsWith("https://"),
+    "Avatar URL must be a valid HTTP or HTTPS URL"
+  )
+  .refine((url) => {
+    // Optional: prefer Cloudinary URLs but allow others
+    return (
+      url.includes("cloudinary.com") ||
+      url.includes("res.cloudinary.com") ||
+      url.includes("images.unsplash.com") ||
+      url.includes("via.placeholder.com") ||
+      url.includes("gravatar.com") ||
+      url.includes("github.com")
+    );
+  }, "Avatar URL should be from a trusted source (Cloudinary, Unsplash, Gravatar, etc.)")
+  .transform((val) => val.trim());
+
 // Auth form validation schemas
 export const authValidations = {
   // Login form validation
@@ -55,6 +76,11 @@ export const authValidations = {
   updateProfile: z.object({
     name: nameSchema,
   }),
+
+  // Avatar update validation
+  updateAvatar: z.object({
+    avatar_url: avatarUrlSchema,
+  }),
 };
 
 // Type exports for form data
@@ -69,6 +95,7 @@ export type ResetPasswordFormData = z.infer<
 export type UpdateProfileFormData = z.infer<
   typeof authValidations.updateProfile
 >;
+export type UpdateAvatarFormData = z.infer<typeof authValidations.updateAvatar>;
 
 // Individual schema exports for convenience
 export const loginSchema = authValidations.login;
@@ -76,6 +103,7 @@ export const registerSchema = authValidations.register;
 export const forgotPasswordSchema = authValidations.forgotPassword;
 export const resetPasswordSchema = authValidations.resetPassword;
 export const updateProfileSchema = authValidations.updateProfile;
+export const updateAvatarSchema = authValidations.updateAvatar;
 
 // Individual field schemas for reuse
-export { nameSchema, emailSchema, passwordSchema };
+export { nameSchema, emailSchema, passwordSchema, avatarUrlSchema };

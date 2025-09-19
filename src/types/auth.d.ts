@@ -44,6 +44,10 @@ interface UserUpdate {
   name: string;
 }
 
+interface AvatarUpdate {
+  avatar_url: string;
+}
+
 interface AuthContextType {
   user: UserResponse | null;
   loading: boolean;
