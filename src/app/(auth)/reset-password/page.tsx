@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { resetPasswordSchema, ResetPasswordFormData } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,23 +25,6 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { authAPI } from "@/services/auth";
-
-// Validation schema for reset password
-const resetPasswordSchema = z
-  .object({
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters long")
-      .regex(/[A-Za-z]/, "Password must contain at least one letter")
-      .regex(/\d/, "Password must contain at least one number"),
-    confirmPassword: z.string().min(1, "Please confirm your password"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
-
-type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 export default function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);

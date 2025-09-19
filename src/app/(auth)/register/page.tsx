@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import { registerSchema, RegisterFormData } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,24 +20,6 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff, Github, Loader2 } from "lucide-react";
 
-// Validation schema for register
-const registerSchema = z
-  .object({
-    email: z.string().email("Please enter a valid email address"),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters long")
-      .regex(/[A-Za-z]/, "Password must contain at least one letter")
-      .regex(/\d/, "Password must contain at least one number"),
-    confirmPassword: z.string().min(1, "Please confirm your password"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
-
-type RegisterFormData = z.infer<typeof registerSchema>;
-
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -49,7 +31,15 @@ export default function Register() {
     loading,
     error,
     clearError,
+    isAuthenticated,
   } = useAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && !loading) {
+      router.push("/user");
+    }
+  }, [isAuthenticated, loading, router]);
 
   const {
     register,

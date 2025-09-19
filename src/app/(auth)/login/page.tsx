@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { loginSchema, LoginFormData } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,14 +20,6 @@ import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff, Github, Loader2 } from "lucide-react";
 import Link from "next/link";
 
-// Validation schema for login
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(1, "Password is required"),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
-
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
@@ -38,7 +30,15 @@ export default function Login() {
     loading,
     error,
     clearError,
+    isAuthenticated,
   } = useAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && !loading) {
+      router.push("/user");
+    }
+  }, [isAuthenticated, loading, router]);
 
   const {
     register,
@@ -51,10 +51,12 @@ export default function Login() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
+      clearError(); // Clear any previous errors
       await loginWithEmail(data.email, data.password);
       router.push("/user");
     } catch (error) {
-      // Error is handled by AuthContext
+      // Error is handled by AuthContext and displayed in the UI
+      // No need to do anything here - the error will show in the error display
     }
   };
 
@@ -221,14 +223,6 @@ export default function Login() {
 
             {/* Links */}
             <div className="text-center space-y-2">
-              <p className="text-sm text-muted-foreground">
-                <a
-                  href="/forgot-password"
-                  className="text-primary hover:underline font-medium"
-                >
-                  Forgot your password?
-                </a>
-              </p>
               <p className="text-sm text-muted-foreground">
                 Don't have an account?{" "}
                 <a

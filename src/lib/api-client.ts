@@ -60,11 +60,22 @@ const createApiClient = (): AxiosInstance => {
     (response) => response,
     (error) => {
       if (error.response?.status === 401) {
-        // Token expired or invalid
-        tokenManager.removeToken();
-        // Optionally redirect to login page
-        if (typeof window !== "undefined") {
-          window.location.href = "/login";
+        // Only redirect if we're not on an auth page (login/register)
+        // This prevents redirecting when login/register fails
+        const currentPath =
+          typeof window !== "undefined" ? window.location.pathname : "";
+        const isAuthPage =
+          currentPath.includes("/login") ||
+          currentPath.includes("/register") ||
+          currentPath.includes("/forgot-password") ||
+          currentPath.includes("/reset-password");
+
+        if (!isAuthPage) {
+          // Token expired or invalid - redirect to login page
+          tokenManager.removeToken();
+          if (typeof window !== "undefined") {
+            window.location.href = "/login";
+          }
         }
       }
       return Promise.reject(error);

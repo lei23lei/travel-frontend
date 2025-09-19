@@ -40,6 +40,10 @@ interface ResetPasswordRequest {
   new_password: string;
 }
 
+interface UserUpdate {
+  name: string;
+}
+
 interface AuthContextType {
   user: UserResponse | null;
   loading: boolean;

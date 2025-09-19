@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { tokenManager } from "@/services/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,7 +34,7 @@ export default function OAuthSuccess() {
 
     if (token) {
       // Success - send token to parent window and close popup
-      if (window.opener) {
+      if (window.opener && !window.opener.closed) {
         window.opener.postMessage(
           {
             type: "OAUTH_SUCCESS",
@@ -43,8 +44,8 @@ export default function OAuthSuccess() {
         );
         window.close();
       } else {
-        // Not in popup, redirect to user page
-        localStorage.setItem("access_token", token);
+        // Not in popup, store token and redirect to user page
+        tokenManager.setToken(token);
         setStatus("success");
         setMessage("Authentication successful! Redirecting...");
         setTimeout(() => {

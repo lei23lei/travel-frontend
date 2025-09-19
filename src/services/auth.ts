@@ -46,6 +46,10 @@ export interface ResetPasswordRequest {
   new_password: string;
 }
 
+export interface UserUpdate {
+  name: string;
+}
+
 // Re-export token manager from api-client for convenience
 export const tokenManager = apiTokenManager;
 
@@ -153,6 +157,21 @@ export const authAPI = {
       const response = await apiClient.post<APIResponse>(
         "/auth/reset-password",
         request
+      );
+
+      return response.data;
+    } catch (error: any) {
+      return apiUtils.handleError(error);
+    }
+  },
+
+  updateUserProfile: async (
+    userUpdate: UserUpdate
+  ): Promise<APIResponse<UserResponse>> => {
+    try {
+      const response = await apiClient.patch<APIResponse<UserResponse>>(
+        "/auth/me",
+        userUpdate
       );
 
       return response.data;

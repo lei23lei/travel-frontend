@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { authAPI, authUtils } from "@/services/auth";
+import { useAuth } from "@/contexts/AuthContext";
+import { Input } from "@/components/ui/input";
+import { nameSchema } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,11 +27,18 @@ import {
   User as UserIcon,
   AlertTriangle,
   Loader2,
+  Pencil,
+  Check,
+  X,
 } from "lucide-react";
 
 export default function User() {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editingName, setEditingName] = useState("");
+  const [nameError, setNameError] = useState("");
+  const { logout: contextLogout, refreshUser } = useAuth();
 
   // Handle client-side mounting
   useEffect(() => {
@@ -52,20 +62,79 @@ export default function User() {
     retry: 1,
   });
 
-  // Logout mutation
+  // Logout mutation using AuthContext
   const logoutMutation = useMutation({
-    mutationFn: authAPI.logout,
+    mutationFn: contextLogout,
     onSuccess: () => {
       router.push("/login");
     },
     onError: () => {
-      // Even if logout API fails, clear token and redirect
-      authUtils.logout();
+      // Even if logout fails, redirect to login
+      router.push("/login");
+    },
+  });
+
+  // Update name mutation
+  const updateNameMutation = useMutation({
+    mutationFn: (newName: string) =>
+      authAPI.updateUserProfile({ name: newName }),
+    onSuccess: () => {
+      setIsEditingName(false);
+      setEditingName("");
+      refetch(); // Refresh user data
+      refreshUser(); // Update AuthContext
+    },
+    onError: (error) => {
+      console.error("Failed to update name:", error);
+      // Keep editing mode open so user can try again
     },
   });
 
   const handleLogout = () => {
     logoutMutation.mutate();
+  };
+
+  const handleEditName = () => {
+    setIsEditingName(true);
+    setEditingName(user?.name || "");
+  };
+
+  const handleSaveName = () => {
+    // Clear previous errors
+    setNameError("");
+
+    try {
+      // Use centralized validation
+      const validatedName = nameSchema.parse(editingName);
+
+      if (validatedName !== (user?.name || "")) {
+        updateNameMutation.mutate(validatedName);
+      } else {
+        setIsEditingName(false);
+        setEditingName("");
+      }
+    } catch (error: any) {
+      // Handle validation errors
+      if (error.errors && error.errors.length > 0) {
+        setNameError(error.errors[0].message);
+      } else {
+        setNameError("Invalid name format");
+      }
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingName(false);
+    setEditingName("");
+    setNameError("");
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSaveName();
+    } else if (e.key === "Escape") {
+      handleCancelEdit();
+    }
   };
 
   // Don't render anything until client-side hydration
@@ -198,19 +267,87 @@ export default function User() {
           <CardContent className="space-y-6">
             {/* Avatar Section */}
             <div className="flex items-center space-x-6 pb-6">
-              <Avatar className="h-20 w-20">
-                <AvatarImage
-                  src={user.avatar_url || undefined}
-                  alt={user.name || user.email}
-                />
-                <AvatarFallback className="text-2xl font-bold">
-                  {user.name
-                    ? user.name.charAt(0).toUpperCase()
-                    : user.email.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <div className="flex flex-col items-center justify-center gap-2">
+                <Avatar className="h-20 w-20 bg-gradient-to-r from-pink-300 to-purple-300">
+                  <AvatarImage
+                    src={user.avatar_url || undefined}
+                    alt={user.name || user.email}
+                  />
+                  <AvatarFallback className="text-2xl font-bold">
+                    {user.name
+                      ? user.name.charAt(0).toUpperCase()
+                      : user.email.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <p className="text-xs text-muted-foreground underline cursor-pointer">
+                  Edit
+                </p>
+              </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-semibold">{user.name || "User"}</h3>
+                <div className="flex flex-row items-center gap-2">
+                  {isEditingName ? (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={editingName}
+                          onChange={(e) => {
+                            setEditingName(e.target.value);
+                            if (nameError) setNameError(""); // Clear error when typing
+                          }}
+                          onKeyDown={handleKeyPress}
+                          placeholder="Enter your name"
+                          className={`text-xl font-semibold h-8 w-48 ${
+                            nameError ? "border-red-500" : ""
+                          }`}
+                          disabled={updateNameMutation.isPending}
+                          autoFocus
+                          maxLength={30}
+                        />
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleSaveName}
+                          disabled={
+                            updateNameMutation.isPending || !editingName.trim()
+                          }
+                          className="h-8 w-8 p-0"
+                        >
+                          {updateNameMutation.isPending ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Check className="w-4 h-4 text-green-600" />
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleCancelEdit}
+                          disabled={updateNameMutation.isPending}
+                          className="h-8 w-8 p-0"
+                        >
+                          <X className="w-4 h-4 text-red-600" />
+                        </Button>
+                      </div>
+                      {nameError && (
+                        <p className="text-red-500 text-sm">{nameError}</p>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        {editingName.length}/30 characters
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <h3 className="text-xl font-semibold">
+                        {user.name || "User name"}
+                      </h3>
+                      <Pencil
+                        className="w-3.5 h-3.5 mt-0.5 cursor-pointer hover:text-primary transition-colors"
+                        onClick={handleEditName}
+                        aria-hidden="true"
+                      />
+                    </>
+                  )}
+                </div>
                 <p className="text-muted-foreground">{user.email}</p>
                 {user.provider && (
                   <Badge variant="secondary">
@@ -223,132 +360,6 @@ export default function User() {
             </div>
 
             <Separator />
-
-            {/* User Details */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>User ID</Label>
-                  <div className="px-3 py-2 bg-muted rounded-md text-sm">
-                    {user.id}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Email Address</Label>
-                  <div className="px-3 py-2 bg-muted rounded-md text-sm">
-                    {user.email}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Username</Label>
-                  <div className="px-3 py-2 bg-muted rounded-md text-sm">
-                    {user.username || "Not set"}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Full Name</Label>
-                  <div className="px-3 py-2 bg-muted rounded-md text-sm">
-                    {user.name || "Not set"}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Account Provider</Label>
-                  <div className="px-3 py-2 bg-muted rounded-md text-sm">
-                    {user.provider
-                      ? user.provider.charAt(0).toUpperCase() +
-                        user.provider.slice(1)
-                      : "Not set"}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Provider ID</Label>
-                  <div className="px-3 py-2 bg-muted rounded-md text-sm">
-                    {user.provider_id || "Not set"}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Account Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Settings className="w-5 h-5 mr-2" aria-hidden="true" />
-              Account Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Button onClick={() => refetch()} variant="outline">
-                <RefreshCw className="w-4 h-4 mr-2" aria-hidden="true" />
-                Refresh Information
-              </Button>
-
-              <Button
-                onClick={() => alert("Profile editing coming soon!")}
-                variant="outline"
-              >
-                <UserIcon className="w-4 h-4 mr-2" aria-hidden="true" />
-                Edit Profile
-              </Button>
-
-              <Button
-                onClick={() => alert("Settings page coming soon!")}
-                variant="outline"
-              >
-                <Settings className="w-4 h-4 mr-2" aria-hidden="true" />
-                Account Settings
-              </Button>
-
-              <Button
-                variant="destructive"
-                onClick={handleLogout}
-                disabled={logoutMutation.isPending}
-              >
-                {logoutMutation.isPending ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
-                )}
-                Sign Out
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Debug Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">
-              Debug Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-muted-foreground space-y-1">
-              <p>
-                <strong>Token Status:</strong>{" "}
-                {authUtils.getToken() ? "✅ Valid" : "❌ Missing"}
-              </p>
-              <p>
-                <strong>API Base URL:</strong>{" "}
-                {process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}
-              </p>
-              <p>
-                <strong>Authentication:</strong>{" "}
-                {authUtils.isAuthenticated()
-                  ? "✅ Authenticated"
-                  : "❌ Not authenticated"}
-              </p>
-            </div>
           </CardContent>
         </Card>
       </div>

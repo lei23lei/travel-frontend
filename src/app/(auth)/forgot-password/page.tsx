@@ -3,9 +3,12 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import {
+  forgotPasswordSchema,
+  ForgotPasswordFormData,
+} from "@/lib/validations";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,13 +21,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Mail, Loader2, CheckCircle } from "lucide-react";
 import { authAPI } from "@/services/auth";
-
-// Validation schema for forgot password
-const forgotPasswordSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-});
-
-type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPassword() {
   const [isSubmitted, setIsSubmitted] = useState(false);

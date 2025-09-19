@@ -21,6 +21,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -31,9 +32,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const handleMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
 
-      if (event.data.type === "OAUTH_SUCCESS" && event.data.token) {
-        tokenManager.setToken(event.data.token);
-        checkAuthStatus();
+      if (event.data.type === "OAUTH_SUCCESS") {
+        if (event.data.token) {
+          tokenManager.setToken(event.data.token);
+        }
+        // Always check auth status after OAuth success and reset loading
+        // but only if we're not in the process of logging out
+        if (!isLoggingOut) {
+          checkAuthStatus();
+        }
+        setLoading(false);
       } else if (event.data.type === "OAUTH_ERROR") {
         setError(event.data.error);
         setLoading(false);
@@ -45,6 +53,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const checkAuthStatus = async () => {
+    // Don't check auth status if we're in the process of logging out
+    if (isLoggingOut) {
+      return;
+    }
+
     try {
       setLoading(true);
       if (!tokenManager.isAuthenticated()) {
@@ -85,13 +98,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       "width=600,height=700,scrollbars=yes,resizable=yes"
     );
 
-    // Monitor the popup
+    if (!popup) {
+      setLoading(false);
+      setError("Failed to open popup. Please check if popups are blocked.");
+      return;
+    }
+
+    // Monitor the popup more frequently and handle edge cases
     const checkClosed = setInterval(() => {
-      if (popup?.closed) {
+      if (popup.closed) {
         clearInterval(checkClosed);
         setLoading(false);
+        // Don't set error here - user might have just closed it intentionally
       }
-    }, 1000);
+    }, 250); // Check every 250ms instead of 1000ms for better responsiveness
+
+    // Cleanup interval after a reasonable timeout (5 minutes)
+    setTimeout(() => {
+      if (checkClosed) {
+        clearInterval(checkClosed);
+        if (!popup.closed) {
+          popup.close();
+        }
+        setLoading(false);
+      }
+    }, 300000); // 5 minutes timeout
   };
 
   const loginWithGoogle = () => {
@@ -105,13 +136,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       "width=600,height=700,scrollbars=yes,resizable=yes"
     );
 
-    // Monitor the popup
+    if (!popup) {
+      setLoading(false);
+      setError("Failed to open popup. Please check if popups are blocked.");
+      return;
+    }
+
+    // Monitor the popup more frequently and handle edge cases
     const checkClosed = setInterval(() => {
-      if (popup?.closed) {
+      if (popup.closed) {
         clearInterval(checkClosed);
         setLoading(false);
+        // Don't set error here - user might have just closed it intentionally
       }
-    }, 1000);
+    }, 250); // Check every 250ms instead of 1000ms for better responsiveness
+
+    // Cleanup interval after a reasonable timeout (5 minutes)
+    setTimeout(() => {
+      if (checkClosed) {
+        clearInterval(checkClosed);
+        if (!popup.closed) {
+          popup.close();
+        }
+        setLoading(false);
+      }
+    }, 300000); // 5 minutes timeout
   };
 
   const loginWithEmail = async (email: string, password: string) => {
@@ -162,6 +211,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
+      setIsLoggingOut(true);
       setLoading(true);
       await authAPI.logout();
     } catch (error) {
@@ -170,6 +220,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
       tokenManager.removeToken();
       setLoading(false);
+      setIsLoggingOut(false);
     }
   };
 
