@@ -46,8 +46,8 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
+    <div className=" min-h-screen bg-gray-400 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md liquid-glass-heavy">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold">
             Welcome to Travel App
