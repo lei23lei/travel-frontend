@@ -150,8 +150,11 @@ export default function User() {
     setNameError("");
 
     try {
+      // Trim the input before validation
+      const trimmedName = editingName.trim();
+
       // Use centralized validation
-      const validatedName = nameSchema.parse(editingName);
+      const validatedName = nameSchema.parse(trimmedName);
 
       if (validatedName !== (user?.name || "")) {
         updateNameMutation.mutate(validatedName);
@@ -344,7 +347,6 @@ export default function User() {
                     <AvatarImage
                       src={user.avatar_url || undefined}
                       alt={user.name || user.email}
-                      className="object-cover"
                     />
                     <AvatarFallback className="text-2xl font-bold">
                       {user.name
@@ -401,7 +403,8 @@ export default function User() {
                         <Input
                           value={editingName}
                           onChange={(e) => {
-                            setEditingName(e.target.value);
+                            // Trim whitespace on change to prevent leading/trailing spaces
+                            setEditingName(e.target.value.trim());
                             if (nameError) setNameError(""); // Clear error when typing
                           }}
                           onKeyDown={handleKeyPress}
@@ -418,7 +421,7 @@ export default function User() {
                           variant="ghost"
                           onClick={handleSaveName}
                           disabled={
-                            updateNameMutation.isPending || !editingName.trim()
+                            updateNameMutation.isPending || !editingName
                           }
                           className="h-8 w-8 p-0"
                         >
@@ -442,7 +445,7 @@ export default function User() {
                         <p className="text-red-500 text-sm">{nameError}</p>
                       )}
                       <p className="text-xs text-muted-foreground">
-                        {editingName.length}/30 characters
+                        {editingName.trim().length}/30 characters
                       </p>
                     </div>
                   ) : (

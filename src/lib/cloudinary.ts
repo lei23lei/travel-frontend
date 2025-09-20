@@ -22,6 +22,66 @@ export interface CloudinaryUploadError {
 let lastUploadTime = 0;
 const UPLOAD_COOLDOWN = 2000; // 2 seconds between uploads
 
+// Helper function to compress and resize image
+const compressImage = (
+  file: File,
+  maxWidth: number = 300,
+  quality: number = 0.8
+): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+
+    img.onload = () => {
+      // Calculate new dimensions while maintaining aspect ratio
+      let { width, height } = img;
+      if (width > maxWidth || height > maxWidth) {
+        if (width > height) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        } else {
+          width = (width * maxWidth) / height;
+          height = maxWidth;
+        }
+      }
+
+      // Set canvas dimensions
+      canvas.width = width;
+      canvas.height = height;
+
+      // Draw and compress
+      ctx?.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error("Failed to compress image"));
+            return;
+          }
+
+          // Create new file with compressed data
+          const compressedFile = new File([blob], file.name, {
+            type: "image/jpeg",
+            lastModified: Date.now(),
+          });
+
+          console.log(
+            `Image compressed: ${file.size} bytes → ${compressedFile.size} bytes`
+          );
+          resolve(compressedFile);
+        },
+        "image/jpeg",
+        quality
+      );
+    };
+
+    img.onerror = () =>
+      reject(new Error("Failed to load image for compression"));
+    img.src = URL.createObjectURL(file);
+  });
+};
+
 export const uploadToCloudinary = async (
   file: File
 ): Promise<CloudinaryUploadResponse> => {
@@ -60,15 +120,28 @@ export const uploadToCloudinary = async (
     throw new Error("File size must be less than 5MB");
   }
 
+  // Compress and resize image for avatar use
+  let processedFile: File;
+  try {
+    processedFile = await compressImage(file, 300, 0.85); // 300px max, 85% quality
+  } catch (error) {
+    console.warn("Image compression failed, using original:", error);
+    processedFile = file;
+  }
+
   console.log("Uploading to Cloudinary with:", {
     cloudName: CLOUD_NAME,
     uploadPreset: UPLOAD_PRESET,
-    fileName: file.name,
-    fileSize: file.size,
+    fileName: processedFile.name,
+    originalSize: file.size,
+    compressedSize: processedFile.size,
+    compressionRatio: `${Math.round(
+      (1 - processedFile.size / file.size) * 100
+    )}%`,
   });
 
   const formData = new FormData();
-  formData.append("file", file);
+  formData.append("file", processedFile);
   formData.append("upload_preset", UPLOAD_PRESET);
   formData.append("cloud_name", CLOUD_NAME);
   formData.append("folder", "travel-avatars");
