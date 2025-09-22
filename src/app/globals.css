@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --background: #000;
+  --foreground: #fff;
+  --authtext: rgba(255, 255, 255, 0.8);
+  --authtext-error: rgba(239, 68, 68, 0.8);
+  --primary: #93c5fd;
+}
+
 /* Apple-style Liquid Glass Effects */
 .liquid-glass {
   background: rgba(255, 255, 255, 0.1);

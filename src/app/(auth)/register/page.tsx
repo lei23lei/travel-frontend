@@ -62,8 +62,10 @@ export default function Register() {
   return (
     <AuthPageWrapper>
       <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-bold">Create Account</CardTitle>
-        <CardDescription>
+        <CardTitle className=" font-bold text-authtext">
+          Create Account
+        </CardTitle>
+        <CardDescription className="text-authtext">
           Join us today and start your travel journey!
         </CardDescription>
       </CardHeader>
@@ -86,8 +88,10 @@ export default function Register() {
             variant="glass"
             className="w-full"
           >
-            <Github className="w-4 h-4 mr-2" aria-hidden="true" />
-            {loading ? "Loading..." : "Continue with GitHub"}
+            <div className="flex items-center justify-center w-60">
+              <Github className="w-4 h-4 mr-2" aria-hidden="true" />
+              {loading ? "Loading..." : "Continue with GitHub"}
+            </div>
           </Button>
 
           <Button
@@ -119,19 +123,19 @@ export default function Register() {
         </div>
 
         {/* Divider */}
-        <div className="relative">
-          <Separator />
-          <div className="absolute inset-0 flex justify-center">
-            <span className="bg-background px-2 text-xs text-muted-foreground">
-              Or continue with email
-            </span>
-          </div>
+
+        <div className="flex justify-center">
+          <span className=" px-2 text-xs text-authtext">
+            Or continue with email
+          </span>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Email Field */}
           <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
+            <Label htmlFor="email" className="text-authtext">
+              Email Address
+            </Label>
             <Input
               {...register("email")}
               id="email"
@@ -140,13 +144,17 @@ export default function Register() {
               disabled={loading}
             />
             {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
+              <p className="text-sm text-authtexterror">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
           {/* Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-authtext">
+              Password
+            </Label>
             <div className="relative">
               <Input
                 {...register("password")}
@@ -172,7 +180,7 @@ export default function Register() {
               </Button>
             </div>
             {errors.password && (
-              <p className="text-sm text-destructive">
+              <p className="text-sm text-authtexterror">
                 {errors.password.message}
               </p>
             )}
@@ -180,7 +188,9 @@ export default function Register() {
 
           {/* Confirm Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="confirmPassword" className="text-authtext">
+              Confirm Password
+            </Label>
             <div className="relative">
               <Input
                 {...register("confirmPassword")}
@@ -206,7 +216,7 @@ export default function Register() {
               </Button>
             </div>
             {errors.confirmPassword && (
-              <p className="text-sm text-destructive">
+              <p className="text-sm text-authtexterror">
                 {errors.confirmPassword.message}
               </p>
             )}
@@ -215,7 +225,9 @@ export default function Register() {
           {/* Error Message */}
           {errors.root && (
             <div className="p-3 bg-destructive/15 border border-destructive/20 rounded-md">
-              <p className="text-sm text-destructive">{errors.root.message}</p>
+              <p className="text-sm text-authtexterror">
+                {errors.root.message}
+              </p>
             </div>
           )}
 
@@ -241,12 +253,9 @@ export default function Register() {
 
           {/* Login Link */}
           <div className="text-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-authtext">
               Already have an account?{" "}
-              <Link
-                href="/login"
-                className="text-primary hover:underline font-medium"
-              >
+              <Link href="/login" className="underline font-medium">
                 Sign in
               </Link>
             </p>

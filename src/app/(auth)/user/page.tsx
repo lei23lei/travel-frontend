@@ -19,6 +19,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import AuthPageWrapper from "@/components/auth/AuthPageWrapper";
+import AuthBackground from "@/components/auth/auth-background";
 import { Separator } from "@/components/ui/separator";
 import {
   Home,
@@ -218,9 +219,12 @@ export default function User() {
   if (!authUtils.isAuthenticated()) {
     return (
       <AuthPageWrapper>
-        <CardContent className="flex items-center justify-center p-6">
-          <Loader2 className="h-6 w-6 animate-spin mr-2" aria-hidden="true" />
-          <p className="text-muted-foreground">Redirecting to login...</p>
+        <CardContent className="flex flex-col items-center justify-center p-6">
+          <Loader2
+            className=" md:h-12 md:w-12 h-8 w-8 animate-spin text-authtext mb-4"
+            aria-hidden="true"
+          />
+          <p className="text-authtext">Redirecting to login...</p>
         </CardContent>
       </AuthPageWrapper>
     );
@@ -232,15 +236,14 @@ export default function User() {
       <AuthPageWrapper>
         <CardContent className="flex flex-col items-center justify-center p-6">
           <Loader2
-            className="h-12 w-12 animate-spin text-primary mb-4"
+            className=" md:h-12 md:w-12 h-8 w-8 animate-spin text-authtext mb-4"
             aria-hidden="true"
           />
-          <p className="text-muted-foreground">Loading user information...</p>
+          <p className="text-authtext">Loading user information...</p>
         </CardContent>
       </AuthPageWrapper>
     );
   }
-
   // Error state
   if (error || !user) {
     return (
@@ -250,7 +253,7 @@ export default function User() {
             className="h-12 w-12 text-destructive mb-4"
             aria-hidden="true"
           />
-          <CardTitle className="text-2xl font-bold mb-4">
+          <CardTitle className=" font-bold mb-4 text-authtext">
             Failed to load user information
           </CardTitle>
           <CardDescription className="mb-6">
@@ -265,7 +268,7 @@ export default function User() {
               variant="outline"
               onClick={handleLogout}
               disabled={logoutMutation.isPending}
-              className="flex-1"
+              className="flex-1 text-authtext"
             >
               {logoutMutation.isPending ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -281,17 +284,17 @@ export default function User() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-400 py-4 px-4 sm:py-12 sm:px-6 lg:px-8">
+    <AuthBackground isUserPage>
       <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6">
         {/* Header */}
         <Card className="liquid-glass-heavy">
           <CardHeader className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
               <div className="flex-1">
-                <CardTitle className="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight">
+                <CardTitle className=" text-authtext font-bold leading-tight">
                   Welcome back !
                 </CardTitle>
-                <CardDescription className="mt-1 text-sm sm:text-base">
+                <CardDescription className="mt-1 text-sm sm:text-base text-authtext">
                   Manage your account and preferences
                 </CardDescription>
               </div>
@@ -326,12 +329,6 @@ export default function User() {
 
         {/* User Information Card */}
         <Card className="liquid-glass-heavy">
-          <CardHeader className="p-4 sm:p-6">
-            <CardTitle className="flex items-center text-lg sm:text-xl">
-              <UserIcon className="w-5 h-5 mr-2" aria-hidden="true" />
-              User Information
-            </CardTitle>
-          </CardHeader>
           <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
             {/* Avatar Section */}
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 pb-4 sm:pb-6">
@@ -358,8 +355,8 @@ export default function User() {
                   )}
                 </div>
                 <div className="flex gap-4 mt-1 ">
-                  <label className="text-xs text-muted-foreground underline cursor-pointer hover:text-primary">
-                    <Upload className="w-4 h-4 hover:text-primary hover:scale-110 duration-500 transition-all" />
+                  <label className="text-xs text-authtext underline cursor-pointer hover:text-primary">
+                    <Upload className="w-4 h-4 hover:scale-110 duration-500 transition-all" />
                     <input
                       type="file"
                       accept="image/*"
@@ -381,7 +378,7 @@ export default function User() {
                       isRefreshingAvatar ||
                       isImageLoading
                     }
-                    className="text-xs text-muted-foreground underline cursor-pointer hover:text-primary disabled:opacity-50"
+                    className="text-xs text-authtext underline cursor-pointer hover:text-primary disabled:opacity-50"
                   >
                     <Shuffle className="w-4 h-4 hover:text-primary hover:scale-110 duration-500 transition-all" />
                   </button>
@@ -420,7 +417,7 @@ export default function User() {
                           {updateNameMutation.isPending ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
-                            <Check className="w-4 h-4 text-green-600" />
+                            <Check className="w-5 h-5 text-green-300" />
                           )}
                         </Button>
                         <Button
@@ -430,36 +427,38 @@ export default function User() {
                           disabled={updateNameMutation.isPending}
                           className="h-8 w-8 p-0 flex-shrink-0"
                         >
-                          <X className="w-4 h-4 text-red-600" />
+                          <X className="w-5 h-5 text-red-500" />
                         </Button>
                       </div>
                       {nameError && (
-                        <p className="text-red-500 text-sm">{nameError}</p>
+                        <p className="text-authtexterror text-sm">
+                          {nameError}
+                        </p>
                       )}
-                      <p className="text-xs ml-2 text-muted-foreground">
+                      <p className="text-xs ml-2 text-authtext">
                         {editingName.trim().length}/30 characters
                       </p>
                     </div>
                   ) : (
                     <div className="flex items-center w-[100%] sm:w-auto gap-2 ">
-                      <h3 className="text-lg sm:text-xl font-semibold  break-words">
+                      <h3 className="text-lg sm:text-xl font-semibold text-authtext break-words">
                         {user.name || "User name"}
                       </h3>
                       <Pencil
-                        className="w-4 h-4 mt-0.5 hover:scale-110 ml-2 duration-500 cursor-pointer hover:text-primary transition-colors flex-shrink-0"
+                        className="w-4 text-authtext h-4 mt-0.5 hover:scale-110 ml-2 duration-500 cursor-pointer hover:text-primary transition-colors flex-shrink-0"
                         onClick={handleEditName}
                         aria-hidden="true"
                       />
                     </div>
                   )}
                 </div>
-                <p className="text-muted-foreground text-sm sm:text-base break-all sm:break-normal">
+                <p className="text-authtext text-sm sm:text-base break-all sm:break-normal">
                   {user.email}
                 </p>
                 {user.provider && (
                   <Badge
                     variant="secondary"
-                    className="w-fit liquid-glass-heavy px-2 py-1"
+                    className="w-fit liquid-glass-heavy px-2 py-1 text-authtext"
                   >
                     {user.provider.charAt(0).toUpperCase() +
                       user.provider.slice(1)}{" "}
@@ -473,6 +472,6 @@ export default function User() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </AuthBackground>
   );
 }

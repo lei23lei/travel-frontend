@@ -11,6 +11,9 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        authtext: "var(--authtext)",
+        authtexterror: "var(--authtext-error)",
+        primary: "var(--primary)",
       },
     },
   },

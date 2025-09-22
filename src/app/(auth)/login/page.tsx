@@ -64,8 +64,8 @@ export default function Login() {
   return (
     <AuthPageWrapper>
       <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-bold ">Sign In</CardTitle>
-        <CardDescription>
+        <CardTitle className=" font-bold text-authtext ">Sign In</CardTitle>
+        <CardDescription className="text-authtext">
           Welcome back! Please sign in to your account.
         </CardDescription>
       </CardHeader>
@@ -88,8 +88,10 @@ export default function Login() {
             variant="glass"
             className="w-full"
           >
-            <Github className="w-4 h-4 mr-2" aria-hidden="true" />
-            {loading ? "Loading..." : "Continue with GitHub"}
+            <div className="flex items-center justify-center w-60">
+              <Github className="w-4 h-4 mr-2" aria-hidden="true" />
+              {loading ? "Loading..." : "Continue with GitHub"}
+            </div>
           </Button>
 
           <Button
@@ -121,19 +123,18 @@ export default function Login() {
         </div>
 
         {/* Divider */}
-        <div className="relative">
-          <Separator />
-          <div className="absolute inset-0 flex justify-center">
-            <span className="bg-background px-2 text-xs text-muted-foreground">
-              Or continue with email
-            </span>
-          </div>
+        <div className="flex justify-center">
+          <span className=" px-2  text-xs text-authtext">
+            Or continue with email
+          </span>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Email Field */}
           <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
+            <Label htmlFor="email" className="text-authtext">
+              Email Address
+            </Label>
             <Input
               {...register("email")}
               id="email"
@@ -142,13 +143,17 @@ export default function Login() {
               disabled={loading}
             />
             {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
+              <p className="text-sm text-authtexterror">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
           {/* Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-authtext">
+              Password
+            </Label>
             <div className="relative">
               <Input
                 {...register("password")}
@@ -174,7 +179,7 @@ export default function Login() {
               </Button>
             </div>
             {errors.password && (
-              <p className="text-sm text-destructive">
+              <p className="text-sm text-authtexterror">
                 {errors.password.message}
               </p>
             )}
@@ -183,14 +188,16 @@ export default function Login() {
           {/* Error Message */}
           {errors.root && (
             <div className="p-3 bg-destructive/15 border border-destructive/20 rounded-md">
-              <p className="text-sm text-destructive">{errors.root.message}</p>
+              <p className="text-sm text-authtexterror">
+                {errors.root.message}
+              </p>
             </div>
           )}
           {/* forgot password link */}
-          <div className="text-right">
+          <div className="text-right text-authtext">
             <Link
               href="/forgot-password"
-              className="text-primary hover:underline font-medium text-sm mr-2"
+              className="underline font-medium text-sm mr-2"
             >
               Forgot Password?
             </Link>
@@ -218,12 +225,9 @@ export default function Login() {
 
           {/* Links */}
           <div className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-authtext">
               Don't have an account?{" "}
-              <a
-                href="/register"
-                className="text-primary hover:underline font-medium"
-              >
+              <a href="/register" className="underline font-medium">
                 Sign up
               </a>
             </p>

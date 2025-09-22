@@ -86,13 +86,13 @@ export default function ResetPassword() {
       <AuthPageWrapper>
         <CardContent className="flex flex-col items-center text-center p-6">
           <AlertTriangle
-            className="h-12 w-12 text-destructive mb-4"
+            className="md:h-10 md:w-10 h-8 w-8 text-authtexterror mb-4"
             aria-hidden="true"
           />
-          <CardTitle className="text-2xl font-bold mb-4">
+          <CardTitle className=" font-bold mb-4 text-authtext">
             Invalid Reset Link
           </CardTitle>
-          <CardDescription className="mb-6">
+          <CardDescription className="mb-6 text-authtext">
             This password reset link is invalid or has expired. Please request a
             new password reset.
           </CardDescription>
@@ -118,13 +118,13 @@ export default function ResetPassword() {
       <AuthPageWrapper>
         <CardContent className="flex flex-col items-center text-center p-6">
           <CheckCircle
-            className="h-12 w-12 text-green-600 mb-4"
+            className="md:h-10 md:w-10 h-8 w-8 text-green-600 mb-4"
             aria-hidden="true"
           />
-          <CardTitle className="text-2xl font-bold mb-4">
+          <CardTitle className=" font-bold mb-4 text-authtext">
             Password Reset Successful
           </CardTitle>
-          <CardDescription className="mb-6">
+          <CardDescription className="mb-6 text-authtext">
             Your password has been successfully reset. You can now sign in with
             your new password.
           </CardDescription>
@@ -140,12 +140,14 @@ export default function ResetPassword() {
   if (tokenValid === null) {
     return (
       <AuthPageWrapper>
-        <CardContent className="flex flex-col items-center justify-center p-6">
+        <CardContent className="flex md:w-[350px] flex-col items-center justify-center p-6">
           <Loader2
-            className="h-12 w-12 animate-spin text-primary mb-4"
+            className="md:h-10 md:w-10 h-8 w-8 animate-spin text-authtext mb-4"
             aria-hidden="true"
           />
-          <CardDescription>Verifying reset link...</CardDescription>
+          <CardDescription className="text-authtext">
+            Verifying reset link...
+          </CardDescription>
         </CardContent>
       </AuthPageWrapper>
     );
@@ -155,18 +157,24 @@ export default function ResetPassword() {
   return (
     <AuthPageWrapper>
       <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-bold">Reset Password</CardTitle>
-        <CardDescription>Enter your new password below.</CardDescription>
+        <CardTitle className=" font-bold text-authtext">
+          Reset Password
+        </CardTitle>
+        <CardDescription className="text-authtext">
+          Enter your new password below.
+        </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 md:w-[400px]">
         {/* Error Message */}
         {error && <ErrorMessage error={error} variant="destructive" />}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="password">New Password</Label>
+            <Label htmlFor="password" className="text-authtext">
+              New Password
+            </Label>
             <div className="relative">
               <Input
                 {...register("password")}
@@ -192,7 +200,7 @@ export default function ResetPassword() {
               </Button>
             </div>
             {errors.password && (
-              <p className="text-sm text-destructive">
+              <p className="text-sm text-authtexterror">
                 {errors.password.message}
               </p>
             )}
@@ -200,7 +208,9 @@ export default function ResetPassword() {
 
           {/* Confirm Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+            <Label htmlFor="confirmPassword" className="text-authtext">
+              Confirm New Password
+            </Label>
             <div className="relative">
               <Input
                 {...register("confirmPassword")}
@@ -226,7 +236,7 @@ export default function ResetPassword() {
               </Button>
             </div>
             {errors.confirmPassword && (
-              <p className="text-sm text-destructive">
+              <p className="text-sm text-authtexterror">
                 {errors.confirmPassword.message}
               </p>
             )}
@@ -254,12 +264,9 @@ export default function ResetPassword() {
 
           {/* Back to Login Link */}
           <div className="text-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-authtext">
               Remember your password?{" "}
-              <Link
-                href="/login"
-                className="text-primary hover:underline font-medium"
-              >
+              <Link href="/login" className="underline font-medium">
                 Back to Sign In
               </Link>
             </p>

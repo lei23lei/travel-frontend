@@ -92,26 +92,30 @@ export default function OAuthSuccess() {
         {status === "processing" && (
           <>
             <Loader2
-              className="h-10 w-10 animate-spin text-primary mb-4"
+              className="md:h-10 md:w-10 h-8 w-8 animate-spin text-authtext mb-4"
               aria-hidden="true"
             />
-            <CardTitle className="text-2xl font-bold mb-4">
+            <CardTitle className=" font-bold mb-4 text-authtext">
               Processing Authentication
             </CardTitle>
-            <CardDescription>{message}</CardDescription>
+            <CardDescription className="text-authtext">
+              {message}
+            </CardDescription>
           </>
         )}
 
         {status === "success" && (
           <>
             <CheckCircle
-              className="h-10 w-10 text-green-600 mb-4"
+              className="md:h-10 md:w-10 h-8 w-8 text-green-600 mb-4"
               aria-hidden="true"
             />
-            <CardTitle className="text-2xl font-bold mb-4">
+            <CardTitle className=" font-bold mb-4 text-authtext">
               Authentication Successful!
             </CardTitle>
-            <CardDescription className="mb-6">{message}</CardDescription>
+            <CardDescription className="mb-6 text-authtext">
+              {message}
+            </CardDescription>
             <Button asChild variant="glass">
               <Link href="/user">
                 <Home className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -124,13 +128,15 @@ export default function OAuthSuccess() {
         {status === "error" && (
           <>
             <AlertTriangle
-              className="h-10 w-10 text-destructive mb-4"
+              className="md:h-10 md:w-10 h-8 w-8 text-authtexterror mb-4"
               aria-hidden="true"
             />
-            <CardTitle className="text-2xl font-bold mb-4">
+            <CardTitle className=" font-bold mb-4 text-authtext">
               Authentication Failed
             </CardTitle>
-            <CardDescription className="mb-6">{message}</CardDescription>
+            <CardDescription className="mb-6 text-authtext">
+              {message}
+            </CardDescription>
             <div className="flex space-x-2 w-full">
               <Button asChild className="flex-1" variant="glass">
                 <Link href="/login">

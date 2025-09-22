@@ -65,10 +65,10 @@ export default function ForgotPassword() {
             className="h-12 w-12 text-green-600 mb-4"
             aria-hidden="true"
           />
-          <CardTitle className="text-2xl font-bold mb-4">
+          <CardTitle className=" font-bold mb-4 text-authtext">
             Check Your Email
           </CardTitle>
-          <CardDescription className="mb-6">
+          <CardDescription className="mb-6 text-authtext">
             We've sent a password reset link to{" "}
             <strong>{getValues("email")}</strong>. Please check your email and
             follow the instructions to reset your password.
@@ -93,10 +93,10 @@ export default function ForgotPassword() {
       ) : (
         <>
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold">
+            <CardTitle className="text-3xl font-bold text-authtext">
               Forgot Password
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-authtext">
               Enter your email address and we'll send you a link to reset your
               password.
             </CardDescription>
@@ -108,7 +108,9 @@ export default function ForgotPassword() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {/* Email Field */}
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email" className="text-authtext">
+                  Email Address
+                </Label>
                 <Input
                   {...register("email")}
                   id="email"
@@ -117,7 +119,7 @@ export default function ForgotPassword() {
                   disabled={isLoading}
                 />
                 {errors.email && (
-                  <p className="text-sm text-destructive">
+                  <p className="text-sm text-authtexterror">
                     {errors.email.message}
                   </p>
                 )}
@@ -148,12 +150,9 @@ export default function ForgotPassword() {
 
               {/* Back to Login Link */}
               <div className="text-center">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-authtext">
                   Remember your password?{" "}
-                  <Link
-                    href="/login"
-                    className="text-primary hover:underline font-medium"
-                  >
+                  <Link href="/login" className="underline font-medium">
                     Back to Sign In
                   </Link>
                 </p>
