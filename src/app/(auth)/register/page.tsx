@@ -124,7 +124,7 @@ export default function Register() {
 
         {/* Divider */}
 
-        <div className="flex justify-center">
+        <div className="flex !-mb-4 justify-center">
           <span className=" px-2 text-xs text-authtext">
             Or continue with email
           </span>
