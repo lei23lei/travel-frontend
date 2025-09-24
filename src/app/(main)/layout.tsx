@@ -1,4 +1,5 @@
 import Nav from "@/components/layout/nav";
+import Chatbot from "@/components/layout/chatbot";
 export default function MainLayout({
   children,
 }: {
@@ -8,6 +9,7 @@ export default function MainLayout({
     <div>
       <Nav />
       {children}
+      <Chatbot />
     </div>
   );
 }

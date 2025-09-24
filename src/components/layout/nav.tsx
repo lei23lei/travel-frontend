@@ -34,7 +34,7 @@ export default function Nav() {
   };
 
   return (
-    <nav className="flex absolute px-10 z-10 w-full justify-between items-center pt-6 bg-transparent">
+    <nav className="flex absolute px-4 md:px-10 z-10 w-full justify-between items-center pt-4 md:pt-6 bg-transparent">
       {/* Left side - Logo/Home */}
       <div className="flex items-center gap-4">
         <Link

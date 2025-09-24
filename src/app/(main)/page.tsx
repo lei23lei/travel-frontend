@@ -134,11 +134,11 @@ export default function Home() {
       <div className="-mt-28 flex flex-col items-center justify-center max-h-screen px-4">
         {/* Hero Section */}
         <div className="text-center mb-6">
-          <div className="flex flex-row gap-4 items-center justify-center mb-4">
-            <h2 className="text-white">Travel</h2>
-            <h2 className="text-primary">Adventure</h2>
+          <div className="flex flex-row gap-4 text-2xl md:text-4xl items-center justify-center mb-4">
+            <p className="text-white">Travel</p>
+            <p className="text-primary">Adventure</p>
           </div>
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl">
+          <p className="text-md md:text-lg text-white/80 max-w-2xl">
             Discover amazing destinations and create unforgettable memories
           </p>
         </div>
