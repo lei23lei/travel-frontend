@@ -19,7 +19,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import AuthPageWrapper from "@/components/auth/AuthPageWrapper";
-import AuthBackground from "@/components/auth/auth-background";
+import AuthBackground from "@/components/auth/auth-bg";
 import { Separator } from "@/components/ui/separator";
 import {
   Home,

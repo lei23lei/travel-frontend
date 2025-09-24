@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import AuthBackground from "./auth-background";
+import AuthBackground from "./auth-bg";
 
 interface AuthPageWrapperProps {
   children: ReactNode;
